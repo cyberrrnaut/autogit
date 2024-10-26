@@ -19,7 +19,7 @@ export function Connect() {
 
       const handleConnectGitHub = () => {
     
-        window.location.href = 'https://workik-be.cyb3rnaut.com/auth/github';
+        window.location.href = `${import.meta.env.VITE_SERVER_BASE_URI}/auth/github`;
       };
   return (
     <div className="flex items-center justify-center h-screen w-full">

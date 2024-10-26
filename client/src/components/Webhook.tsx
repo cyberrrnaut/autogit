@@ -60,7 +60,7 @@ export default function Webhook() {
       try {
         const fullRepoName = `${username}/${repo}`; 
         const response = await axios.post(
-          'https://workik-be.cyb3rnaut.com/create-webhook',
+          `${import.meta.env.VITE_SERVER_BASE_URI}/create-webhook`,
           { token: storedToken, repo: fullRepoName },   
           { headers: { 'Content-Type': 'application/json' } }
         );
