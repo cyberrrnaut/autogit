@@ -21,20 +21,24 @@ dotenv_1.default.config();
 const openai = new openai_1.default({
     apiKey: process.env.OPENAI_API_KEY,
 });
-const redirect_uri = "https://workik-be.cyb3rnaut.com";
+const redirect_uri = "https://workik-be.cyb3rnaut.com/callback";
 const app = (0, express_1.default)();
 const PORT = 5000;
 app.use((0, cors_1.default)());
 app.use(express_1.default.json());
 app.get("/up", (req, res) => {
+    console.log("this route was invoked");
     res.json({ "msg": "the site is up" });
 });
 // Step 1: Redirect to GitHub OAuth
 app.get('/auth/github', (req, res) => {
-    const redirectURI = `https://github.com/login/oauth/authorize?client_id=${process.env.GITHUB_CLIENT_ID}&scope=repo&redirect_uri=${redirect_uri}`;
+    const redirectURI = `https://github.com/login/oauth/authorize?client_id=${process.env.GITHUB_CLIENT_ID}&scope=repo&redirect_uri=${process.env.SERVER_BASE_URI}/callback`;
     res.redirect(redirectURI);
 });
 console.log(process.env.GITHUB_CLIENT_ID);
+console.log(process.env.GITHUB_CLIENT_ID);
+console.log(process.env.CLIENT_URI);
+console.log(process.env.SERVER_BASE_URI);
 // Step 2: Handle OAuth Callback and Get Access Token
 app.get('/callback', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const requestToken = req.query.code;
@@ -49,7 +53,7 @@ app.get('/callback', (req, res) => __awaiter(void 0, void 0, void 0, function* (
         });
         const accessToken = response.data.access_token;
         // Redirect to frontend with the token as a query parameter
-        res.redirect(`http://localhost:5173?token=${accessToken}`);
+        res.redirect(`${process.env.CLIENT_URI}//?token=${accessToken}`);
     }
     catch (err) {
         console.error('Error getting access token:', err);
@@ -69,7 +73,7 @@ app.post('/create-webhook', (req, res) => __awaiter(void 0, void 0, void 0, func
             active: true,
             events: ['push', 'pull_request'],
             config: {
-                url: 'https://workik-be/webhook',
+                url: `${process.env.SERVER_BASE_URI}/webhook`,
                 content_type: 'json',
                 insecure_ssl: '0',
             },

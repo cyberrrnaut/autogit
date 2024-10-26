@@ -26,17 +26,22 @@ interface ChangedFile {
   
 
 app.get("/up",(req,res)=>{
+  console.log("this route was invoked");
+  
   res.json({"msg":"the site is up"})
 })
 
 
 // Step 1: Redirect to GitHub OAuth
 app.get('/auth/github', (req, res) => {
-  const redirectURI = `https://github.com/login/oauth/authorize?client_id=${process.env.GITHUB_CLIENT_ID}&scope=repo&redirect_uri=${redirect_uri}`;
+  const redirectURI = `https://github.com/login/oauth/authorize?client_id=${process.env.GITHUB_CLIENT_ID}&scope=repo&redirect_uri=${process.env.SERVER_BASE_URI}/callback`;
   res.redirect(redirectURI);
 });
 
 console.log(process.env.GITHUB_CLIENT_ID);
+console.log(process.env.GITHUB_CLIENT_ID);
+console.log(process.env.CLIENT_URI);
+console.log(process.env.SERVER_BASE_URI);
 
 
 // Step 2: Handle OAuth Callback and Get Access Token
@@ -56,7 +61,7 @@ app.get('/callback', async (req, res) => {
       const accessToken = response.data.access_token;
   
       // Redirect to frontend with the token as a query parameter
-      res.redirect(`https://autogit.cyb3rnaut.com//?token=${accessToken}`);
+      res.redirect(`${process.env.CLIENT_URI}//?token=${accessToken}`);
     } catch (err) {
       console.error('Error getting access token:', err);
       res.status(500).json({ error: 'OAuth failed' });
@@ -82,7 +87,7 @@ app.post('/create-webhook', async (req, res:any) => {
           active: true,
           events: ['push', 'pull_request'],
           config: {
-            url: 'https://workik-be.cyb3rnaut.com/webhook',
+            url: `${process.env.SERVER_BASE_URI}/webhook`,
             content_type: 'json',
             insecure_ssl: '0',
           },
